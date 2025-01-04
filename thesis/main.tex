@@ -1,0 +1,737 @@
+%------------------------------------
+%   basic settings
+%------------------------------------
+\documentclass[12pt,a4paper,oneside]{jsbook}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{url}
+\usepackage{here}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage[ipaex]{pxchfon}
+\usepackage{otf}
+\usepackage{listings}
+%------------------------------------
+%   listings settings (minted -> listings)
+%------------------------------------
+\lstset{
+  basicstyle=\ttfamily\small,  % Font style
+  numbers=left,                % Add line numbers
+  numberstyle=\tiny,           % Line number style
+  stepnumber=1,                % Line number increment
+  frame=single,                % Add a frame around the code
+  tabsize=4,                   % Tab size
+  breaklines=true,             % Allow line breaking
+  keywordstyle=\bfseries,      % Keywords in bold
+  commentstyle=\itshape,       % Comments in italics
+  stringstyle=\color{red},     % Strings in red
+  showspaces=false,            % Do not mark spaces
+  showstringspaces=false,      % Do not mark string spaces
+  language=Python              % Default language
+}
+
+%------------------------------------
+%   margin settings
+%------------------------------------
+\setlength{\topmargin}{-5mm}
+\setlength{\fullwidth}{125mm}
+\setlength{\textwidth}{\fullwidth}
+\setlength{\oddsidemargin}{5mm}
+\setlength{\evensidemargin}{\oddsidemargin}
+%------------------------------------
+%   newtheorems
+%------------------------------------
+\theoremstyle{plain}
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{corollary}[theorem]{系}
+\newtheorem{lemma}[theorem]{補題}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{conjecture}[theorem]{予想}
+\newtheorem{proposition}[theorem]{命題}
+\newtheorem{problem}[theorem]{問題}
+\newtheorem{definition}[theorem]{定義}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{claim}{Claim}
+\newtheorem{subclaim}{Subclaim}[claim]
+\newcommand{\resetclaim}{\setcounter{claim}{0}}
+\newtheorem{case}{Case}
+\newtheorem{subcase}{Subcase}[case]
+\newcommand{\resetcase}{\setcounter{case}{0}}
+%------------------------------------
+%   display figures
+%   #1=width, #2=filename,
+%   #3=caption, #4=label
+%   \fig{0.8\linewidth}{aaa.pdf}{bbb}{ccc}
+%------------------------------------
+\renewcommand{\figurename}{図.}
+\newcommand{\fig}[4]{
+\begin{figure}[H]
+\centering
+\includegraphics[width=#1]{#2}
+\caption{#3}
+\label{#4}
+\end{figure}
+}
+\newcommand{\figg}[4]{
+\begin{figure*}[h!t]
+\centering
+\includegraphics[width=#1]{#2}
+\caption{#3}
+\label{#4}
+\end{figure*}
+}
+%------------------------------------
+%   setting of algorithms
+%------------------------------------
+\renewcommand{\algorithmicrequire}{\textbf{条件:}}
+\renewcommand{\algorithmicensure}{\textbf{実行結果:}}
+\algrenewcommand\algorithmicdo{}
+\algrenewcommand\algorithmicthen{}
+%------------------------------------
+%   other renewcommands and newcommands
+%------------------------------------
+\renewcommand{\proofname}{\bf 証明.}
+%------------------------------------
+%   Title & Authors
+%------------------------------------
+\title{
+卒業論文\\[1.5cm]
+地理的犯罪予測手法の改良\\
+タイトルタイトルタイトルタイトル\\[5cm]
+}
+\author{高知大学 理工学部 情報科学科\\[0.5cm]
+B213R018Y 橋本響}
+\date{2024年度}
+
+%------------------------------------
+\begin{document}
+%------------------------------------
+%タイトルページの出力
+\maketitle
+%目次の作成・出力
+\tableofcontents
+
+%------------------------------------
+%   Chapter 1
+\chapter{序論}
+\label{chapter_1}
+%------------------------------------
+\section{背景}
+%------------------------------------
+犯罪予測は現代社会における重要な課題であり，昨今の地理情報システム（GIS）の進展により，
+犯罪が発生した時間・場所などのデータを活用した，効率的な防犯システムの構築が求められている.
+
+近い将来における犯罪発生のリスクが高い場所を予測する地理的な犯罪予測手法のひとつに，
+Caplan et al.(2011)
+\cite{caplan2011}
+が提唱するRisk Terrain Modeling(以下RTM)が存在する．
+地理的な犯罪予測は，欧米などの警察実務に取り入れられており，最近では，日本の警察でも予測に基づく警察活動を
+導入する動きが見られる．
+
+RTMは犯罪の集積を引き起こす地理的要因の地理的分布をマッピングし，それらを重ね合わせることで，
+月〜年単位の比較的長期の犯罪発生リスクを定量的に予測する手法である．
+
+%------------------------------------
+\section{課題}
+%------------------------------------
+RTMは，犯罪発生の空間的リスクを評価するための有効な手法として注目されている．
+しかし，その実用性をさらに高めるためには，いくつかの重要な課題を解決する必要がある．
+第一に，RTMの基盤となる統計モデルは主に線形モデルで構築されており，
+地理的要因間の複雑な非線形関係や交互作用を十分に捉えられていない．
+この制約により，犯罪発生のメカニズムを詳細に反映することが難しく，予測精度が限られている可能性がある．
+特に，犯罪は多くの社会的，経済的，環境的要因が複雑に絡み合う現象であるため，
+モデルの設計においてこれらの要因の非線形的な影響を考慮することは不可欠である．
+
+さらに，現在のRTMでは主に特定の犯罪タイプ（例: 強盗）に焦点を当てたモデル構築が一般的であり，
+その他の犯罪タイプやそれらが与える相互作用的な影響を十分に組み込んでいない．
+この結果，現行のRTMは全体的な犯罪リスクの評価において網羅性を欠く可能性がある．
+例えば，窃盗や暴力事件といった犯罪が特定の地域における強盗リスクを高める可能性があるにもかかわらず，
+それらのデータが活用されていない場合，モデルは過小評価を生む恐れがある．
+
+第二に，RTMは変数間の統計的関連性に基づいてリスクを評価する一方で，それらの因果関係を明確にする手法を組み込んでいない．
+例えば，特定の地理的要因（例: 放置された建物や学校の近接性）が直接的に犯罪を引き起こすのか，
+あるいはそれ以外の中間要因を通じて影響を与えているのかを明らかにすることは，モデルの解釈性を向上させる上で極めて重要である．
+この解釈性が欠如していると，政策立案者や実務者にとってモデルの結果を具体的な犯罪予防策に結び付けることが困難となる．
+%------------------------------------
+\section{研究目的}
+%------------------------------------
+本研究は，上述の課題に対処し，RTMの予測精度と解釈性を向上させることを目指す．具体的には，次の二つの目標を掲げる．
+
+第一に，RTMの予測精度を高めるために，新たなデータや手法を導入する．
+特に，強盗以外の犯罪データを統合し，犯罪リスクに関する多面的な視点を提供することで，従来のRTMの予測能力を補完する．
+また，モデルに非線形項を導入することで，地理的要因間の複雑な関係性を捉え，犯罪発生リスクのより正確な予測を実現し，
+従来の線形モデルでは見逃されていたリスクパターンを捕捉することを目指す．
+
+第二に，RTMの解釈性を向上させるために，因果推論モデルを活用する．
+具体的には，地理的要因間の因果関係を推定し，それぞれの要因が犯罪リスクに与える影響のメカニズムを明確化する．
+このアプローチにより，政策立案者や治安機関がモデルの結果をもとに具体的かつ効果的な介入策を設計できるようになる．
+
+本研究では，これらの目標を達成するために，統計的手法と因果推論手法を統合した革新的なアプローチを提案する．この取り組みは，
+犯罪予防の実践的応用にとどまらず，犯罪リスクの空間的評価における新たな学術的貢献をもたらすことを期待している．
+
+%------------------------------------
+\chapter{関連研究}
+\label{chapter_2}
+%------------------------------------
+\section{RTMの現状}
+%------------------------------------
+RTMは，犯罪発生の空間的リスクを評価するための手法として，過去10年以上にわたり広く研究されてきた．
+CaplanとKennedy（2011）
+\cite{caplan2011}
+によるRTMの基礎的な研究では，RTMの概念と技術的手法を確立し，犯罪リスクがどのように地理的要因に基づいて形成されるかを示している．
+この研究は，リスク要因（例: 放置された建物やバー，学校の位置）を特定し，
+これらの要因が重なる場所で犯罪リスクが高まることを示したものである.
+
+%------------------------------------
+\section{予測精度向上の手法}
+%------------------------------------
+\section{因果推論モデル}
+%------------------------------------
+
+%------------------------------------
+\chapter{研究手法}
+%------------------------------------
+\section{データセット}
+%------------------------------------
+\section{モデルの構築}
+%------------------------------------
+\section{評価方法}
+%------------------------------------
+
+%------------------------------------
+\chapter{結果}
+\section{予測精度}
+\section{可視化}
+\section{解釈性}
+
+\chapter{考察}
+\section{予測精度向上の意義}
+\section{因果推論の価値}
+\section{限界と将来の課題}
+
+\section{結論}
+
+第1章をゼロから書くのは大変難しい
+そこで，まずは中間発表会のスライドの
+「本研究の目的と概要」までを
+そのまま流し込んでみるのが良い。
+つまり，
+スライドの台本をそのままコピペし，
+スライドの画像をpdf化して追加し，
+論文らしい文章や図に仕上げていく。
+
+句読点は日本の公文書に倣い
+全角の「，」と「。」を使う。
+語尾は「ですます調」ではなく「である調」とする。
+本文中で数学としての英数字を使うときは
+必ず\$コマンドで挟む。
+例えば「n頂点」ではなく「$n$頂点」と書く。
+
+図表の参照は，
+「～～を図\ref{fig_yymmdd_1}に示す。」
+「～～を～～と呼ぶ（図\ref{fig_yymmdd_1}）。」
+のように，
+本文中にrefコマンドで図表番号を挿入して行う。
+図表のキャプション（説明文）を必ず書く。
+
+\fig{0.85\textwidth}
+{fig_yymmdd_1.pdf}
+{図のサンプル}
+{fig_yymmdd_1}
+
+参考文献の参照は，
+「～～であることが知られている
+\cite{佐藤2014}。」
+「金子
+\cite{Kaneko2000}
+は，～～であることを示した。」
+のように，
+本文中にciteコマンドで文献番号を挿入して行う。
+参考文献リストは著者名のアルファベット順とする。
+したがって，
+本文中では文献番号の若い順に登場させなくてよい。
+
+以下に第1章の書き方例を挙げる。
+
+\bigskip
+
+平面上に複数の赤点と青点が
+どの3点も一直線上に並ばないように配置されているとき，
+図\ref{fig_yymmdd_2}のように
+1本の直線で赤点と青点のそれぞれを
+同時に半数ずつに分割することができる。
+これをハムサンドイッチの定理という
+\cite{Edelsbrunner1987}。
+Lo, Matou{\v{s}}ek, Steiger
+\cite{Lo1994}
+はこのような分割直線を$O(n)$の計算量で発見する
+アルゴリズムを設計した。
+
+\fig{0.75\textwidth}
+{fig_yymmdd_1.pdf}
+{ハムサンドイッチの定理}
+{fig_yymmdd_2}
+
+平面上に赤点と青点が$n$個ずつ
+どの3点も一直線上に並ばないように配置されているとき，
+図\ref{fig_yymmdd_3}のように
+赤点と青点をつなぐ$n$本の直線分からなるマッチングを
+交差無く描けることも知られている
+\cite{Larson1983}。
+
+\fig{0.75\textwidth}
+{fig_yymmdd_1.pdf}
+{赤点青点無交差マッチング}
+{fig_yymmdd_3}
+
+本論文では，
+着色された複数の点が平面上に
+どの3点も一直線上に並ばないように配置されているとき，
+それらの点をすべて直線分で交差無くつないでできる
+木を描くことを考える。
+そのような木のうち，
+どの直線分も異なる色の2点をつないでいるような木のことを
+無交差彩色的treeと呼ぶ。
+特に，その最大次数が$k$であるものを
+無交差彩色的$k$-treeと呼ぶ。
+ただし，色数が赤と青の2色しかない場合は
+どの部分道も赤点と青点が交互に現れることから
+特別に無交差交互$k$-treeと呼ぶ。
+
+金子
+\cite{Kaneko2000}
+は，
+平面上に赤点と青点が同数個ずつ
+どの3点も一直線上に並ばないように配置されているとき，
+無交差交互3-treeが描けることを証明した。
+その後，加納・鈴木・宇野
+\cite{Kano2014}
+は，色数を3色以上に拡張した次の定理を示した。
+
+\begin{theorem}[加納・鈴木・宇野
+\cite{Kano2014}]
+2色以上で着色された$n$個の点が平面上に
+どの3点も一直線上に並ばないように配置されているとき，
+各色の点の数がいずれも
+$\lceil \frac{n}{2} \rceil$
+以下ならば，
+無交差彩色的3-treeを描くことができる。
+\label{thm20181017_1}
+\end{theorem}
+
+図\ref{fig_yymmdd_4}に具体例を示す。
+平面上に$n=10$個の点が
+どの3点も一直線上に並ばないように配置されており，
+その内訳は赤点が3個，青点が3個，緑点が2個，黄点が2個
+であるから，各色の点の数はいずれも
+$\lceil \frac{n}{2} \rceil$
+以下である。
+したがって，無交差彩色的3-treeを描くことができる。
+
+\fig{0.75\textwidth}
+{fig_yymmdd_1.pdf}
+{無交差彩色的3-tree}
+{fig_yymmdd_4}
+
+定理\ref{thm20181017_1}の条件の下で
+無交差彩色的3-treeを描くアルゴリズムはまだ知られていない。
+しかし，加納・鈴木・宇野
+\cite{Kano2014}
+による証明は数学的帰納法によるものであった。
+そこで，本研究では
+その証明を基に再帰的アルゴリズムを設計することを目指した。
+
+加納らによる証明では，
+平面上に赤点と青点が
+どの3点も一直線上に並ばないように配置されているとき，
+赤点と青点の個数の差が1もしくは2であっても
+無交差交互3-treeが描けることを
+補題として別に証明し利用している。
+したがって，
+加納らによる証明を基に
+無交差彩色的3-tree描画アルゴリズムを設計するためには
+赤点と青点の個数の差が2以下の場合における
+無交差交互3-tree描画アルゴリズムをまず設計する必要がある。
+
+そこで本研究では，
+赤点と青点の個数差を2まで許す
+無交差交互3-tree描画アルゴリズムを設計し，
+JavaScriptおよびp5.jsによって実装した。
+
+
+%------------------------------------
+%   Chapter 2
+\chapter{いいかんじの章タイトル}
+% \label{chapter_2}s
+%------------------------------------
+各章の冒頭ではその章の概要を数行で書く。
+
+%------------------------------------
+\section{いいかんじの節タイトル}
+%------------------------------------
+中間発表会のスライドをそのまま流し込んでみる。
+スライドの台本をそのままコピペする。
+スライドの画像をpdf化して追加する。
+論文らしい文章や図に仕上げていく。
+中間発表会で省略した詳細も書き加える。
+
+%------------------------------------
+\section{いいかんじの節タイトル}
+%------------------------------------
+中間発表会のスライドをそのまま流し込んでみる。
+スライドの台本をそのままコピペする。
+スライドの画像をpdf化して追加する。
+論文らしい文章や図に仕上げていく。
+中間発表会で省略した詳細も書き加える。
+
+
+%------------------------------------
+%   Chapter 3
+\chapter{いいかんじの章タイトル}
+\label{chapter_3}
+%------------------------------------
+各章の冒頭ではその章の概要を数行で書く。
+
+%------------------------------------
+\section{いいかんじの節タイトル}
+%------------------------------------
+中間発表会のスライドをそのまま流し込んでみる。
+スライドの台本をそのままコピペする。
+スライドの画像をpdf化して追加する。
+論文らしい文章や図に仕上げていく。
+中間発表会で省略した詳細も書き加える。
+
+%------------------------------------
+\section{いいかんじの節タイトル}
+%------------------------------------
+中間発表会のスライドをそのまま流し込んでみる。
+スライドの台本をそのままコピペする。
+スライドの画像をpdf化して追加する。
+論文らしい文章や図に仕上げていく。
+中間発表会で省略した詳細も書き加える。
+
+%------------------------------------
+\section{提案アルゴリズム}
+%------------------------------------
+赤点と青点の個数差を2まで許す無交差交互3-tree
+描画アルゴリズムをAlgorithm \ref{alg_1}に示す。
+
+\begin{algorithm}
+\caption{赤点と青点の個数差を2まで許す
+無交差交互3-tree描画アルゴリズム}
+\label{alg_1}
+\begin{algorithmic}[1]
+\Require
+$R$と$B$はそれぞれ平面上の赤点集合と青点集合である。
+$X=R \cup B$の点達はどの3点も一直線上に並ばないように
+配置されている。
+$conv(X)$を$X$の凸包の境界とし，
+その境界上の$X$の点$v \in X \cap conv(X)$を
+指定点とする。
+以上の$R,B,v$は
+(i) $|B| = 1, 1 \le |R| \le 3, v \in R$，
+(ii) $2 \le |B|, |R| = |B| + 2, v \in R$，
+(iii) $2 \le |B| \le |R| \le |B| +1$
+のいずれかを満たす。
+\Ensure
+指定点$v$の次数が1となるような
+無交差交互3-treeが描画される。
+\Procedure {Alt3Tree}{$R$, $B$, $v$}
+\If {$|B| = 1, 1 \le |R| \le 3, v \in R$}
+\State 青点を中心とする，星グラフ$K_{1, |R|}$を描く。
+\EndIf
+\If {$n = 4$}
+\State $X$上の無交差交互完全マッチングを描く。
+\State $v$のマッチング相手を$a$とする。
+\State $X - \{v, a\}$の2点のうち，$a$と色が異なる方を$b$とおく。
+\State $a$と$b$を直線分で繋ぐ。
+\EndIf
+\If {$n \ge 5$}
+\State $conv(X)$上で$v$の左隣のXの点を$a$，
+右隣の$X$の点を$b$とおく。
+\If {$a$, $b$の少なくとも一方（$u$とおく）の色が$v$と異なる。}
+\If {$2 \le |B|, |R| = |B| + 2, v \in R$}
+\State $R' \leftarrow R - v$
+\State $v' \leftarrow u$
+\State \Call{Alt3Tree}{$R'$, $B$, $v'$}を実行する。
+\State $vu$を繋ぐ。
+\EndIf
+\If {$2 \le |B| \le |R| \le |B| +1, v \in R$}
+\State $R' \leftarrow B$
+\State $B' \leftarrow R - v$
+\State $v' \leftarrow u$
+\State \Call{Alt3Tree}{$R'$, $B'$, $v'$}を実行する。
+\State $vu$を繋ぐ。
+\EndIf
+\If {$2 \le |B| \le |R| \le |B| +1, v \in B$}
+\State $R' \leftarrow R$
+\State $B' \leftarrow B - v$
+\State $v' \leftarrow u$
+\State \Comment Part2へ続く．
+\algstore{bkbreak}
+\end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[H]
+\addtocounter{algorithm}{-1}
+\caption{Part 2}
+\begin{algorithmic}[1]
+\algrestore{bkbreak}
+\State \Call{Alt3Tree}{$R'$, $B'$, $v'$}を実行する。
+\State $vu$を繋ぐ。
+\EndIf
+\EndIf
+\If {$a, b$とも$v$と同色}
+\If {$a, b, v \in R$}
+\ForAll {$u \in X - v$, ただし$u$と$a$の色は異なる}
+\State
+$Left \leftarrow \{直線vuの左側のXの点\} \cup \{u\}$
+\State $Right \leftarrow (X - v) - Left$
+\If {$|Left|$が偶数かつ，
+$|Left \cap R| = |Left \cap B|$かつ，
+$||Right \cap R| - |Right \cap B|| \le 1$}
+\State $x_p \leftarrow u$とおいてforを抜ける。
+\EndIf
+\EndFor
+\State $W  \leftarrow R \cap Left$
+\State $K  \leftarrow B \cap Left$
+\State \Call{Alt3Tree}{$K$, $W$, $x_p$}を実行する。
+\State $W  \leftarrow R \cap Right$
+\State $K  \leftarrow (B \cap Right) \cup \{x_p\}$
+\State \Call{Alt3Tree}{$K$, $W$, $x_p$}を実行する。
+\State $vx_p$を繋ぐ。
+\EndIf
+\If {$a, b, v \in B$}
+\For {$u \in X - v$, ただし$u$と$a$の色は異なる}
+\State
+$Left  \leftarrow \{直線vuの左側のXの点\} \cup \{v, u\}$
+\State $Right  \leftarrow X - Left$
+\If {$|Left|$が偶数かつ，
+$|Left \cap R| = |Left \cap B|$かつ，
+$||Right \cap R| - |Right \cap B|| \le 1$}
+\State $x_p \leftarrow u$とおいてforを抜ける。
+\EndIf
+\EndFor
+\State $W  \leftarrow R \cap Left$
+\State $K  \leftarrow B \cap (Left - \{v\})$
+\State \Call{Alt3Tree}{$W$, $K$, $x_p$}を実行する。
+\State $W  \leftarrow R \cap Right$
+\State $K \leftarrow (B \cap Right) \cup \{x_p\}$
+\State \Call{Alt3Tree}{$W$, $K$, $x_p$}を実行する。
+\State $vx_p$を繋ぐ。
+\EndIf
+\EndIf
+\EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
+
+%------------------------------------
+%   Chapter 4
+\chapter{いいかんじの章タイトル}
+\label{chapter_4}
+%------------------------------------
+各章の冒頭ではその章の概要を数行で書く。
+
+%------------------------------------
+\section{いいかんじの節タイトル}
+%------------------------------------
+中間発表会のスライドをそのまま流し込んでみる。
+スライドの台本をそのままコピペする。
+スライドの画像をpdf化して追加する。
+論文らしい文章や図に仕上げていく。
+中間発表会で省略した詳細も書き加える。
+
+%------------------------------------
+\section{いいかんじの節タイトル}
+%------------------------------------
+中間発表会のスライドをそのまま流し込んでみる。
+スライドの台本をそのままコピペする。
+スライドの画像をpdf化して追加する。
+論文らしい文章や図に仕上げていく。
+中間発表会で省略した詳細も書き加える。
+
+
+%------------------------------------
+%   Chapter 5
+\chapter{おわりに}
+\label{chapter_5}
+%------------------------------------
+これまでに書いた内容を簡潔にまとめる。
+ただし，第1章とは異なり，
+ここまで論文を読み終えた読者を想定しているため，
+これまでに登場した専門用語や事実等を
+改めて説明することなく使用してかまわない。
+「～を考察した。」ではなく，
+「～であることが分かった。」のように
+結論を述べる。
+今後の課題も書く。
+
+
+%------------------------------------
+%   Acknowledgements
+\chapter*{謝辞}
+%------------------------------------
+\addcontentsline{toc}{chapter}{謝辞}
+（研究を遂行するにあたってサポートしてくれた方々へ
+謝辞を述べるコーナー。
+名前だけでなくどのようなサポートをしてくれたのかも書く。）
+
+(例)
+本研究を進めるにあたりご指導頂きました
+鈴木一弘先生に感謝いたします。
+本論文で主査と副査をして頂きました
+\CID{8705}田直樹先生と塩田研一先生に感謝いたします。
+日頃の議論を通じて多くの知識や示唆を頂きました
+鈴木研究室の皆様に感謝いたします。
+
+
+
+%------------------------------------
+%   References
+%------------------------------------
+\renewcommand{\bibname}{参考文献}
+\begin{thebibliography}{99}
+
+\bibitem{英語文献の例}
+著者1の姓, 著者1の名;
+著者2の姓, 著者2の名;
+{文献タイトル}.
+{\em journal title or publisher}
+{\bfseries 巻}
+(出版年),
+ページ番号.
+
+\bibitem{日本語文献の例}
+著者1;
+著者2;
+{文献タイトル}.
+{出版雑誌名または出版社} %emを外す
+{\bfseries 巻}
+(出版年),
+ページ番号.
+
+\bibitem{英語のWebページの例}
+著者1の姓, 著者1の名;
+著者2の姓, 著者2の名;
+{文献タイトル}.
+\url{URL}
+(2099年99月99日 閲覧).
+
+\bibitem{日本語のWebページの例}
+著者1;
+著者2;
+{文献タイトル}.
+\url{URL}
+(2099年99月99日 閲覧).
+
+\bibitem{caplan2011}
+Caplan, Joel;
+Kennedy, Leslie;
+Miller, Joel
+{Risk Terrain Modeling: Brokering Criminological Theory 
+and GIS Methods for Crime Forecasting}.
+{\em Justice Quarterly}
+{\bfseries 28(2)}
+(2011).
+360-381
+
+\bibitem{Appel1989}
+Appel, Kenneth;
+Haken, Wolfgang;
+{Every planar map is four colorable}.
+{\em Contemporary Mathematics}
+{\bfseries 98}
+(1989).
+
+\bibitem{Edelsbrunner1987}
+Edelsbrunner, Herbert;
+{Algorithms in Combinatorial Geometry}.
+{\em Springer-Verlag Berlin Heidelberg}
+(1987).
+
+\bibitem{Grundy1939}
+Grundy, Patrick Michael;
+{Mathematics and games}.
+{\em Eureka}
+{\bfseries 2}
+(1939),
+6--8,
+{\em reprinted in Eureka}
+{\bfseries 27}
+(1964),
+9--11.
+
+\bibitem{Kaneko2000}
+Kaneko, Atsushi;
+{On the maximum degree of bipartite embeddings
+of trees in the plane}.
+{\em
+Discrete and Computational Geometry,
+Lecture Notes in Comput. Sci.}
+{\bfseries 1763}
+(2000),
+166--171.
+
+\bibitem{Kano2014}
+Kano, Mikio;
+Suzuki, Kazuhiro;
+Uno, Miyuki;
+{Properly Colored Geometric Matchings and
+3-Trees Without Crossings on Multicolored Points
+in the Plane}.
+{\em
+Discrete and Computational Geometry and Graphs,
+Lecture Notes in Comput. Sci.}
+{\bfseries 8845}
+(2014),
+96--111.
+
+\bibitem{Larson1983}
+Larson, Loren C.;
+{Problem-Solving Through Problems}.
+{\em Springer-Verlag New York}
+(1983).
+
+\bibitem{Lo1994}
+Lo, Chi Yuan;
+Matou{\v{s}}ek, J.;
+Steiger, W.;
+{Algorithms for ham-sandwich cuts}.
+{\em Discrete Comput. Geom.}
+{\bfseries 11}
+(1994),
+433--452.
+
+\bibitem{McCarthp5js}
+McCarth, Lauren Lee;
+{p5.js}.
+\url{https://p5js.org/}
+(2018年12月6日 閲覧).
+
+\bibitem{佐藤2014}
+佐藤文広;
+{石取りゲームの数学---ゲームと代数の不思議な関係}.
+{数学書房}
+(2014).
+
+\end{thebibliography}
+
+
+%------------------------------------
+\appendix
+%------------------------------------
+\chapter{プログラム}
+\label{program}
+% \inputminted[breaklines,breakanywhere,linenos,tabsize=4]
+% {JavaScript}{discrete_geometry.js}
+
+
+%------------------------------------
+\end{document}
+%------------------------------------
