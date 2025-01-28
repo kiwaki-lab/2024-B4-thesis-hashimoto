@@ -1,4 +1,5 @@
 .vscode/
+thesis/out/
 .DS_Store
 *.log
 *.pdf
