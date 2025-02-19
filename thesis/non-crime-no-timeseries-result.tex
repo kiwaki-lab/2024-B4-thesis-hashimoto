@@ -8,17 +8,17 @@ False Positive(FP)・False Negative(FN)のグリッドセルを地図上に図�
 2011年〜2013年でモデルを学習し，2014年で評価した結果を示す．
 2014年に実際に起った強盗犯罪の発生地点とそれに基づいた実際のリスクマップを
 図\ref{fig:non-crime-no-timeseries-actual-risk}に示す．
-
-DFによる予測結果を図\ref{fig:non-crime-no-timeseries-df-risk}に，
-CFによる予測結果を図\ref{fig:non-crime-no-timeseries-cf-risk}に示す．
-実際のリスクマップと比べて，離散型特徴量によるリスクマップでは高い空間相関を持つが，
-連続型特徴量によるリスクマップは空間相関が削減された．
-
+DFによるリスクマップを図\ref{fig:non-crime-no-timeseries-df-risk}に，
+CFによるリスクマップを図\ref{fig:non-crime-no-timeseries-cf-risk}に，
 NEによるリスクマップを図\ref{fig:non-crime-no-timeseries-ne-risk}に，
 LDによるリスクマップを図\ref{fig:non-crime-no-timeseries-ld-risk}に，
 GFによるリスクマップを図\ref{fig:non-crime-no-timeseries-gf-risk}に，
 TGによるリスクマップを図\ref{fig:non-crime-no-timeseries-tg-risk}に，
-GF+TGによるリスクマップを図\ref{fig:non-crime-no-timeseries-gf-tg-risk}に示した．
+GF+TGによるリスクマップを図\ref{fig:non-crime-no-timeseries-gf-tg-risk}に
+示す．
+実際のリスクマップと比べて，DFによるリスクマップでは高い空間相関を持つが，
+CF，NE，LD,GFによるリスクマップは空間相関が削減された．
+また，TGでは若干の空間相関を持つがGF+TGでは空間相関が削減された．
 
 
 また，
@@ -168,17 +168,26 @@ GF+TGによるリスクマップを図\ref{fig:non-crime-no-timeseries-gf-tg-ris
 % table
 %------------------------------------------
 各モデルの予測精度を精度指標を基に比較した結果を表\ref{tb:non-crime-no-timeseries-index}にまとめる．
+最も的中率が高いモデルはDFであるが，これは偽陽性を評価できていないのでPAIとAUCに注目する.
+PAIについて注目すると，DFとCFの比較から特徴量を連続化すると大きな改善が確認できた．
+また，距離特徴量を変換するNE，LD，GFではCFによる連続化と同等の改善がみられ，
+GF+TGが最もPAIが高くなった．
+AUCについて注目すると，DFと比較すると全てのモデルで同等の改善がみられ，
+PAIと同様にGF+TGが最も高くなった．
+
+また，DFとGF+TGのAUC値の有意差を評価するためにDeLong検定\citep{DeLong}を実施した結果，
+p<0.001となり，両者のAUCに統計的に有意な差があることが確認できた．
 
 \begin{table}[htbp]
   \centering
   \caption{各モデル間の精度比較}
-  \begin{tabular}{l|r|r|r|r|r|r|r}
+  \begin{tabular}{l|r||r|r|r|r|r|r}
   \hline
 
-  モデル & DF & CF & NE & LD & GF & TG & GF+TG \\  \hline\hline
-的中率 & 50.2 & 30.7 & 30.3 & 34.4 & 34.1 & 38.1 & 36.9 \\ 
-PAI & 1.93 & 2.35 & 2.28 & 2.36 & 2.36 & 2.40 & 2.41 \\ 
-AUC & 0.74 & 0.78 & 0.77 & 0.78 & 0.78 & 0.78 & 0.79 \\ \hline
+モデル & DF & CF & NE & LD & GF & TG & GF+TG \\  \hline\hline
+的中率 & \bf{50.2} & 30.7 & 30.3 & 34.4 & 34.1 & 38.1 & 36.9 \\ 
+PAI & 1.93 & 2.35 & 2.28 & 2.36 & 2.36 & 2.40 & \bf{2.41} \\ 
+AUC & 0.74 & 0.78 & 0.77 & 0.78 & 0.78 & 0.78 & \bf{0.79} \\ \hline
 
 
   \end{tabular}
